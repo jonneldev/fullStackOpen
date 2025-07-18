@@ -16,13 +16,14 @@ const App = () => {
 
   const handleNextAnexdote = () => {
     const random = Math.floor(Math.random() * anecdotes.length) 
-    selected(random)
+    console.log(random)
+    setSelected(random)
   }
   return (
     <div>
       {anecdotes[selected]}
       <button 
-        onClick={ () => console.log(handleNextAnexdote)}
+        onClick={handleNextAnexdote}
         style={{
         display: "block"
       }}>next anecdote</button>
