@@ -16,10 +16,12 @@ const App = () => {
   const [votes, setVotes] = useState(Array(anecdotes.length).fill(0))
 
   const handleVotes = () => {
-    const copy = [...votes]
-    copy[selected] += 1
-    setVotes(copy)
-  }
+  setVotes(prev => {
+    const updatedVotes = [...prev];
+    updatedVotes[selected] += 1;
+    return updatedVotes;
+  });
+};
 
   const handleNextAnexdote = () => {
     const random = Math.floor(Math.random() * anecdotes.length) 
