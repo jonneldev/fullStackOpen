@@ -2,7 +2,6 @@ import { useState, useEffect } from "react"
 import Filter from "./components/Filter"
 import PersonForm from "./components/PersonForm"
 import Persons from "./components/Persons"
-import axios from "axios"
 import phonebookService from "./services/phonebook"
 
 function App() {
@@ -12,36 +11,54 @@ function App() {
   const [filterName, setFilterName] = useState('')
 
   useEffect(() => {
-    console.log('effect')
     phonebookService
       .getAll()
       .then(initialPhonebook => {
-        console.log(initialPhonebook)
         setPersons(initialPhonebook)
       })
   },[])
 
-  console.log('run', persons.length)
+  const updatePersonNumber = async (id, updatedPerson) => {
+    
+    
+    const returnPerson = await phonebookService.update(id, updatedPerson)
 
-  const addPerson = (event) => {
+    setPersons(persons.map(person =>
+      person.id === id ? returnPerson : person
+    ))
+  }
+
+  const addPerson = async (event) => {
     event.preventDefault()
 
     const newPerson = {
-      name: newName,
-      number: newNumber
+      name: newName.trim(),
+      number: newNumber.trim(),
     }
+
+    const existingPerson = persons.find(person => 
+      person.name === newPerson.name)
+
+    const updatedPerson = { ...existingPerson, number: newPerson.number }
 
     const nameExist = persons.some(person =>
-      person.name === newName
+      person.name.toLowerCase() === newPerson.name.toLowerCase()
     )
 
-    if(nameExist) {
-      alert(`${newPerson.name} is already added to phonebook`)
-    } else {
-      setPersons(persons.concat(newPerson))
+    try {
+      if(nameExist && window.confirm(`${newPerson.name} is already added to phonebook, replace the old number with new one?`)) {
+        updatePersonNumber(existingPerson.id, updatedPerson)
+      } else {
+        const returnedPerson = await phonebookService.create(newPerson)
+        setPersons(prev => prev.concat(returnedPerson))
+      }
+    } catch (error) {
+      console.error('Error adding person:', error)
+      alert('Something went wrong while adding the person. Please try again.')
+    } finally {
+      setNewName('')
+      setNewNumber('')
     }
-    setNewName('')
-    setNewNumber('')
   }
 
   const handleNameChange = (event) => {
@@ -56,22 +73,35 @@ function App() {
     setFilterName(event.target.value)
   }
 
-
  const displayPersons = persons.filter(person =>
   person.name.toLocaleLowerCase().includes(filterName)
  )
 
+ const removePerson = (id, name) => {
+  if (window.confirm(`Delete ${name} ?`)) {
+    phonebookService
+      .remove(id)
+      .then(() => {
+        setPersons(prev => 
+          prev.filter(person => person.id !== id)
+        )
+      })
+      .catch(error => {
+        console.error('Error removing person:', error)
+        alert(`Information of ${name} has already been removed from server.`)
+      })
+  }
+ }
+
   return (
     <div>
       <h2>Phonebook</h2>
-
       <Filter 
         value={filterName} 
         handleFilterNameChange={handleFilterNameChange} 
       />
 
       <h3>Add a new</h3>
-
       <PersonForm 
         addPerson={addPerson} 
         newName={newName}
@@ -81,8 +111,10 @@ function App() {
       />
 
       <h3>Numbers</h3>
-      
-      <Persons displayPersons={displayPersons} />
+      <Persons 
+        displayPersons={displayPersons}      
+        removePerson={removePerson} 
+      />
     </div>
   )
 }
