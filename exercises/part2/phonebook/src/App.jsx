@@ -1,14 +1,20 @@
 import { useState, useEffect } from "react"
+import Notification from "./components/Notification"
 import Filter from "./components/Filter"
 import PersonForm from "./components/PersonForm"
 import Persons from "./components/Persons"
 import phonebookService from "./services/phonebook"
+
 
 function App() {
   const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filterName, setFilterName] = useState('')
+  const [notificationMessage, setNotificationMessage] = useState({
+    message: null,
+    type: null,
+  })
 
   useEffect(() => {
     phonebookService
@@ -19,13 +25,21 @@ function App() {
   },[])
 
   const updatePersonNumber = async (id, updatedPerson) => {
-    
-    
-    const returnPerson = await phonebookService.update(id, updatedPerson)
-
-    setPersons(persons.map(person =>
+    try {
+      const returnPerson = await phonebookService.update(id, updatedPerson)
+      setPersons(persons.map(person =>
       person.id === id ? returnPerson : person
-    ))
+      ))
+      setNotificationMessage({
+        message: `${returnPerson.name} number updated to ${returnPerson.number}`,
+        type: "success"
+      })
+    } catch (error) {
+      setNotificationMessage({
+        message: `Information of ${updatedPerson.name} has already been removed from the server`,
+        type: "error"
+      })
+    }    
   }
 
   const addPerson = async (event) => {
@@ -47,9 +61,13 @@ function App() {
 
     try {
       if(nameExist && window.confirm(`${newPerson.name} is already added to phonebook, replace the old number with new one?`)) {
-        updatePersonNumber(existingPerson.id, updatedPerson)
+        await updatePersonNumber(existingPerson.id, updatedPerson)     
       } else {
         const returnedPerson = await phonebookService.create(newPerson)
+        setNotificationMessage({
+          message: `${returnedPerson.name} added`,
+          type: "success"
+        })
         setPersons(prev => prev.concat(returnedPerson))
       }
     } catch (error) {
@@ -58,6 +76,9 @@ function App() {
     } finally {
       setNewName('')
       setNewNumber('')
+      setTimeout(() => {
+        setNotificationMessage({ message: null, type: null })
+      }, 3000)
     }
   }
 
@@ -96,6 +117,10 @@ function App() {
   return (
     <div>
       <h2>Phonebook</h2>
+      {
+        notificationMessage.message 
+        && <Notification message={notificationMessage.message} type={notificationMessage.type} />
+      }
       <Filter 
         value={filterName} 
         handleFilterNameChange={handleFilterNameChange} 
