@@ -1,30 +1,29 @@
 import { useState, useEffect } from "react"
-import axios from 'axios'
+import countryService from './services/countryService'
 
 function App() {
-  const url = 'https://studies.cs.helsinki.fi/restcountries/'
   const [countries, setCountries] = useState(null)
   const [value, setValue] = useState('')
 
   useEffect(() => {
     console.log(`effect run`);
 
-    if(countries) {
-      console.log(`fetching countries`)
-      axios
-        .get(`${url}api/all/`)
-        .then(response => {
-          console.log(response)
-        })
-    } else {
-      console.log(`empty countries`)
-    }
+    countryService
+      .getAll()
+      .then(data => {
+        const countryName = data
+        .map(countryData => countryData.name.common)
+        setCountries(countryName)
+      })
     
-  }, [countries])
+  }, [])
+
+  console.log(countries)
 
   const handleChange = (event) => {
-    setValue(event.target.value)
+    setValue(event.target.value) 
   }
+
 
   
   return (
