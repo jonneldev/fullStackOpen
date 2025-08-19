@@ -1,9 +1,12 @@
 import { useState, useEffect } from "react"
 import countryService from './services/countryService'
+import DisplayCountries from "./components/DisplayCountries"
 
 function App() {
-  const [countries, setCountries] = useState(null)
+  const [countries, setCountries] = useState([])
+  const [countryData, setCountryData] = useState('')
   const [value, setValue] = useState('')
+  const [searchedCountry, setSearchedCountry] = useState([])
 
   useEffect(() => {
     console.log(`effect run`);
@@ -18,13 +21,17 @@ function App() {
     
   }, [])
 
-  console.log(countries)
-
   const handleChange = (event) => {
     setValue(event.target.value) 
   }
 
-
+  const filteredCountry = countries.filter(country => {
+    if(!value || null) {
+      return  
+    } else {
+      return country.toLowerCase().includes(value.toLowerCase())
+    }
+  })
   
   return (
     <div>
@@ -39,9 +46,11 @@ function App() {
           onChange={handleChange}
         />
       </div>
-      <div>
-
-      </div>
+      {
+        countries
+        ? <DisplayCountries filteredCountry={filteredCountry} value={value} />
+        : null
+      }
     </div>
   )
 }
