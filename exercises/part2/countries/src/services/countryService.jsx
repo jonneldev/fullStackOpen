@@ -1,6 +1,7 @@
 import axios from 'axios'
 const baseUrl = import.meta.env.VITE_API_COUNTRY_BASE_URL;
-
+const weatherURL = "https://api.openweathermap.org"
+const apiKey = import.meta.env.VITE_WEATHER_API
 
 const getAll = async () => {
   const { data } = await axios.get(`${baseUrl}api/all`)
@@ -22,9 +23,15 @@ const remove = async (id) => {
   return data
 }
 
+const getWeather = async (capitalCity) => {
+  const { data } = await axios.get(`${weatherURL}/data/2.5/weather?q=${capitalCity}&appid=${apiKey}`)
+  return data
+}
+
 export default {
   getAll,
   create,
   update,
-  remove
+  remove,
+  getWeather
 }
