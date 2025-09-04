@@ -1,21 +1,5 @@
 # Node modules
 node_modules/
 
-# Build outputs
-dist/
-build/
-out/
-release/
-
-# OS-specific
-.DS_Store
-Thumbs.db
-
-# IDE/editor settings
-.vscode/
-.idea/
-*.sublime-project
-*.sublime-workspace
-
 .env
  
