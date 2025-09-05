@@ -3,7 +3,7 @@ const app = express()
 var morgan = require('morgan')
 
 app.use(express.json())
-
+app.use(express.static('dist'))
 morgan.token('body', (req) => JSON.stringify(req.body || '-'))
 
 app.use(
@@ -115,7 +115,7 @@ const unknownEndpoint = (request, response) => {
 app.use(unknownEndpoint)
 
 
-const PORT = 3001 || 3002
+const PORT = process.env.PORT || 3001
 app.listen(PORT)
 console.log(`Server running on port ${PORT}`)
 
