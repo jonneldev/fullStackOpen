@@ -67,7 +67,7 @@ const App = () => {
       <Notification message={errorMessage} />
       <div>
         <button onClick={() => setShowAll(!showAll)}>
-          show {showAll ? 'important' : 'all'}
+          Show {showAll ? 'important' : 'all'}
         </button>
       </div>
       <ul>
@@ -83,7 +83,7 @@ const App = () => {
       </ul>
       <form onSubmit={addNote}>
         <input value={newNote} onChange={handleNoteChange} />
-        <button type="submit">save</button>
+        <button type="submit">Save</button>
       </form>
 
       <Footer />

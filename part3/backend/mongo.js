@@ -6,17 +6,12 @@ if (process.argv.length < 3) {
 }
 
 const password = process.argv[2]
-const password1 = process.argv
 
-console.log(password)
-console.log(password1)
-
-
-const url = `mongodb+srv://jonneldev:${password}@cluster0.ucyz5oa.mongodb.net/noteApp?retryWrites=true&w=majority&appName=Cluster0`
+const url = `mongodb+srv://fullstackopen:${password}@cluster0.crn8o21.mongodb.net/noteApp?appName=Cluster0`
 
 mongoose.set('strictQuery',false)
 
-mongoose.connect(url)
+mongoose.connect(url, { family: 4 })
 
 const noteSchema = new mongoose.Schema({
   content: String,
@@ -25,12 +20,19 @@ const noteSchema = new mongoose.Schema({
 
 const Note = mongoose.model('Note', noteSchema)
 
-const note = new Note({
-  content: 'HTML is easy',
-  important: true,
-})
+// const note = new Note({
+//   content: 'HTML is easy1',
+//   important: true,
+// })
 
-note.save().then(result => {
-  console.log('note saved!')
+// note.save().then(result => {
+//   console.log('note saved!')
+//   mongoose.connection.close()
+// })
+
+Note.find({}).then(result => {
+  result.forEach(note => {
+    console.log(note)
+  })
   mongoose.connection.close()
 })
